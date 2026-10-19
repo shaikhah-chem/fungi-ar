@@ -51,13 +51,20 @@ header p{margin:2px 0 0;font-size:13px;opacity:.85}
 .credit{position:fixed;left:10px;bottom:4px;font-size:10px;color:rgba(255,255,255,.55);z-index:8;pointer-events:none;direction:rtl}
 @media (min-width:900px){header h1{font-size:24px}}
 </style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1F3D2E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="الفطر بين يديكِ">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>#offline{position:fixed;top:118px;left:50%;transform:translateX(-50%);z-index:8;background:rgba(255,255,255,.94);color:#1F3D2E;font-weight:700;font-size:13px;padding:6px 14px;border-radius:999px;box-shadow:0 3px 10px rgba(0,0,0,.25);display:none;white-space:nowrap}
+#offline.ok{background:#E3F5EE;color:#0f6b65}</style>
 </head>
 <body>
 <div id="bg"></div>
 <video id="cam" playsinline muted autoplay></video>
 <canvas id="c"></canvas>
 <header>
-  <div class="t"><h1>الفطر بين يديكِ</h1><p>مدخل إلى الفطريات · استكشفي الأجزاء بلمسة</p></div>
+  <div class="t"><h1>الفطر بين يديكِ</h1><p>مدخل إلى الفطريات</p></div>
   <span class="badge">واقع معزز</span>
 </header>
 <div id="modes">
@@ -76,7 +83,8 @@ header p{margin:2px 0 0;font-size:13px;opacity:.85}
   <h2 id="qt"></h2><div id="qo"></div><div id="fb"></div>
   <div class="row"><button class="btn ghost" id="qClose">إغلاق</button><button class="btn" id="qNext">التالي</button></div>
 </div></div>
-<div class="credit">تنفيذ المعلمة: أ. شيخه المطيري</div>
+<div id="offline"></div>
+
 
 <script>console.warn('Scripts "build/three.js" and "build/three.min.js" are deprecated with r150+, and will be removed with r160. Please use ES Modules or alternatives: https://threejs.org/docs/index.html#manual/en/introduction/Installation'),
 /**
@@ -183,7 +191,7 @@ const PINS={
  hyph:[['septH',new THREE.Vector3(-2.3,1.45,0)],['sep',new THREE.Vector3(1.3,1.27,0)],['pore',new THREE.Vector3(0,0.85,0.2)],['nuc',new THREE.Vector3(-0.65,0.85,0.25)],['wall',new THREE.Vector3(2.2,0.85,0.42)],['coeno',new THREE.Vector3(-2.3,-0.25,0)],['nuc',new THREE.Vector3(0.92,-0.85,0.2)]]
 };
 const pinsEl=document.getElementById('pins');let pinEls=[];let mode='mush';
-function buildPins(){pinsEl.innerHTML='';pinEls=PINS[mode].map(([k,v])=>{const d=document.createElement('div');d.className='pin';d.innerHTML='<span class="dot"></span><span class="lb">'+INFO[k][0]+'</span>';d.onclick=()=>showInfo(k,d);pinsEl.appendChild(d);return{d,v,k};});}
+function buildPins(){pinsEl.innerHTML='';pinEls=[];return;pinEls=PINS[mode].map(([k,v])=>{const d=document.createElement('div');d.className='pin';d.innerHTML='<span class="dot"></span><span class="lb">'+INFO[k][0]+'</span>';d.onclick=()=>showInfo(k,d);pinsEl.appendChild(d);return{d,v,k};});}
 const info=document.getElementById('info');
 function showInfo(k,d){pinEls.forEach(p=>p.d.classList.remove('sel'));if(d)d.classList.add('sel');info.querySelector('h3').textContent=INFO[k][0];info.querySelector('p').textContent=INFO[k][1];info.style.display='block';}
 info.querySelector('.x').onclick=()=>{info.style.display='none';pinEls.forEach(p=>p.d.classList.remove('sel'));};
@@ -259,6 +267,16 @@ function loop(){requestAnimationFrame(loop);
 }
 loop();
 })();
+</script>
+<script>
+(function(){var b=document.getElementById('offline');
+function show(t,ok){b.textContent=t;b.className=ok?'ok':'';b.style.display='block';setTimeout(function(){b.style.display='none'},6000);}
+if('serviceWorker' in navigator){
+ navigator.serviceWorker.register('sw.js').then(function(r){
+  if(navigator.serviceWorker.controller){ if(!navigator.onLine) show('تعمل الآن دون إنترنت ✓',true); }
+  else { navigator.serviceWorker.ready.then(function(){ show('✓ حُفظت الصفحة في جوالك… ستعمل في الحصة دون إنترنت',true); }); }
+ }).catch(function(){});
+}})();
 </script>
 </body>
 </html>
